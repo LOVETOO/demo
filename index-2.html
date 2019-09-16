@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>vue demo</title>
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+<div id="app">
+<div class="list">
+<!-- 循环数组 -->
+<li v-for="(item,i) in items">索引值：{{i}} --- {{item}}</li>
+<li v-for="(list,i) in lists">索引值：{{i}} --- {{list.id}} --- {{list.name}}</li>
+<!-- 循环对象 -->
+<li v-for="(val,key,index) in infos">索引值：{{index}} --- 键：{{key}} --- {{val}}</li>
+<!-- 迭代数字 -->
+<li v-for="count in 10">第 {{count}} 次循环</li>
+</div>
+
+<div class="add">
+<label>ID:
+<input type="text" v-model="id">
+</label>
+<label>NAME:
+<input type="text" v-model="name">
+</label>
+<input type="button" value="添加" @click="add">
+<!-- key保证循环的唯一性，添加选项时确保选中选项不变，并且值为number -->
+<li v-for="item in list" :key="item.id">
+<input type="checkbox">{{item.id}} --- {{item.name}}
+</li>
+</div>
+
+<div class="show">
+<!-- <input type="button" value="点击" @click="toggle"> -->
+<input type="button" value="点击" @click="flag=!flag">
+<!-- v-if有较高切换性能消耗，不利于频繁切换 -->
+<!-- v-show有较高的初始渲染消耗，不利于一直隐藏的元素 -->
+<h3 v-if="flag">v-if</h3>
+<h3 v-show="flag">v-show</h3>
+</div>
+</div>
+
+<script type="text/javascript" src="./lib/vue.js"></script>
+<script type="text/javascript">
+var vm = new Vue({
+    el:'#app',
+    data:{
+        msg:'欢迎12345',
+        items:[
+            1,2,3,4,5
+        ],
+        lists:[
+            {id:1,name:'mz1'},
+            {id:2,name:'mz2'},
+            {id:3,name:'mz3'},
+        ],
+        infos:{
+            id:1,
+            name:'名字',
+            gender:'男'
+        },
+        id:'',
+        name:'',
+        list:[
+            {id:1,name:'嬴政'},
+            {id:2,name:'李斯'},
+            {id:3,name:'赵高'},
+            {id:4,name:'韩非'},
+            {id:5,name:'荀子'}
+        ],
+        flag:true
+    },
+    methods:{
+        add(){
+            // this.list.push({id:this.id,name:this.name})
+            this.list.unshift({id:this.id,name:this.name})
+        },
+        // toggle(){
+        //     this.flag=!this.flag
+        // }
+    }
+})
+</script>
+</body>
+</html>

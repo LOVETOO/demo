@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>vue demo</title>
+    <style type="text/css">
+        [v-cloak]{
+            display: none;
+        }
+        .inner{
+            height: 100px;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+<p v-cloak>{{msg}}</p>
+<h1 v-text="msg"></h1>
+<div v-html="msg2"></div>
+<input type="button" value="按钮" :title="msg+'123'" @click="show">
+<br>
+<input type="button" value="开始" @click="start">
+<input type="button" value="停止" @click="stop">
+<h4>{{msg}}</h4>
+
+<div class="inner" @click="btninner">
+    <!-- 阻止冒泡 -->
+    <input type="button" value="戳他" @click.stop="btninput">
+    <!-- 阻止默认事件 -->
+    <a href="http://baidu.com" @click.stop.prevent="btna">百度</a>
+</div>
+
+<!-- 冒泡从外到里 -->
+<div class="inner" @click.capture="btninner">
+    <input type="button" value="戳他" @click="btninput">
+</div>
+
+<!-- 点击自身才会触发事件 -->
+<div class="inner" @click.self="btninner">
+    <input type="button" value="戳他" @click="btninput">
+    <!-- 只阻止冒泡和默认事件一次 -->
+    <a href="http://baidu.com" @click.stop.prevent.once="btna">百度</a>
+</div>
+
+<div class="inner" @click.self="btninner">
+    <!-- 数据双向绑定 -->
+    <input type="text" v-model="msg">
+    <h4 :class="['thin','italic',{'active':flag}]" :style="[styleobj,styleobj1]">{{msg}}</h4>
+</div>
+
+
+</div>
+
+<script type="text/javascript" src="./lib/vue.js"></script>
+<script type="text/javascript">
+var vm = new Vue({
+    el:'#app',
+    data:{
+        msg:'欢迎12345',
+        msg2:'<h1>123</h1>',
+        intervalID:null,
+        flag:true,
+        styleobj:{color:'red','font-weight':200},
+        styleobj1:{'font-style':'italic'}
+    },
+    methods:{
+        show(){
+            alert(123)
+        },
+        start(){
+            if(this.intervalID!=null)return;
+            this.intervalID=setInterval(()=>{
+                var start=this.msg.substring(0,1)
+                var end=this.msg.substring(1)
+                this.msg=end+start
+            },500)
+        },
+        stop(){
+            clearInterval(this.intervalID)
+            this.intervalID=null
+        },
+        btninner(){
+            alert(123)
+        },
+        btninput(){
+            alert(1233)
+        },
+        btna(){
+            alert(1234)
+        }
+    }
+})
+</script>
+</body>
+</html>
