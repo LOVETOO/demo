@@ -1,3 +1,4 @@
+<!-- post\get\jsonp使用 -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,6 +8,9 @@
     <title>vue demo</title>
     <link rel="stylesheet" href="./lib/bootstrap-3.3.7.min.css">
     <style type="text/css">
+        [v-cloak]{
+            display: none;
+        }
 
     </style>
 </head>
@@ -19,20 +23,13 @@
     </div>
     <div class="panel-body form-inline">
         <label>
-            ID:
-            <input type="text" class="form-control" v-model="id">
-        </label>
-        <label>
             NAME:
-            <!-- 键盘按键： .enter\.tab\.delete\.esc\.space\.up\.down\.left\.right\键盘码\自定义键值: -->
             <input type="text" class="form-control" v-model="name" @keyup.enter="add">
         </label>
         <!-- 点击事件中加小括号可以传参 -->
         <input type="button" value="添加" class="btn btn-primary" @click="add()">
         <label>
             搜索:
-            <!-- <input type="text" class="form-control" v-model="keyword" v-focus v-color> -->
-            <!-- 如果blue没有单引号就是变量了: -->
             <input type="text" class="form-control" v-model="keyword" v-focus v-color="'blue'">
         </label>
     </div>
@@ -58,24 +55,8 @@
     </tbody>
 </table>
 
-<!-- 过滤器 -->
-<p v-cloak>{{msg | msgFormat('12','3') | msgtest}}</p>
 </div>
 
-
-
-
-<div id="app2">
-<p v-color="'yellow'" v-fontweight="700" v-fontsize="30">{{dt | dateFormat('')}}</p>
-</div>
-
-<div id="app3">
-<input type="button" value="修改" @click="msg='no'">
-<h3 id="app3_h3">{{msg}}</h3>
-<input type="button" value="get请求" @click="getInfo">
-<input type="button" value="post请求" @click="postInfo">
-<input type="button" value="jsonp请求" @click="jsonpInfo">
-</div>
 
 
 <script type="text/javascript" src="./lib/vue.js"></script>
@@ -83,17 +64,9 @@
 <script type="text/javascript" src="./lib/vue-resource-1.5.1.js"></script>
 
 <script type="text/javascript">
-
-// 全局过滤器,比如数据输出前做处理
-Vue.filter('msgFormat',function(msg,arg,arg2) {
-    // return msg.replace('123','111')
-    // 方法二，正则匹配，g是代表全局匹配
-    return msg.replace(/123/g,arg+arg2)
-});
-
-Vue.filter('msgtest',function(msg) {
-    return msg+'第二个过滤器'
-});
+// 全局配置
+Vue.http.options.root='http://vue.studyit.io'
+Vue.http.options.emulateJSON=true //post请求
 
 Vue.filter('dataFormat',function(dateStr,pattern='') {//ES6中，如果pattern为undefined，则赋值为空
     var dt=new Date(dateStr)
@@ -111,11 +84,6 @@ Vue.filter('dataFormat',function(dateStr,pattern='') {//ES6中，如果pattern�
         return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
     }
 });
-
-
-// 自定义键盘修饰符,f2键
-Vue.config.keyCodes.f2=113
-
 
 // 自定义全局指令,定义时不用加'v-'前缀,但是调用时必须加;参数2是对象,含一些指令函数
 Vue.directive('focus',{
@@ -147,153 +115,47 @@ var vm = new Vue({
     },
     methods:{
         add(){
-            var car={id:this.id,name:this.name,ctime:new Date()}
-            this.list.push(car)
-            this.id=this.name=''
+             this.$http.post('api/addproduct',{name:this.name}).then(result=>{
+                this.name=''
+                if (result.body.status===0) {
+                    this.getAlllist()
+                }else{
+                    alert('添加失败')
+                }
+            }).catch((e) => {})
         },
         del(id){
-            // 方法一,i是索引
-            // this.list.some((item,i)=>{
-            //     if (item.id==id) {
-            //         this.list.splice(i,1)
-            //         return true
-            //     }
-            // })
-            // 方法二,返回索引
-            var index=this.list.findIndex(item=>{
-                if (item.id==id) {
-                    return true
+            this.$http.get('api/delproduct/'+id).then(result=>{
+                if (result.body.status===0) {
+                    this.getAlllist()
+                }else{
+                    alert('删除失败')
                 }
-            })
-            this.list.splice(index,1) //slice(start,end)已有的数组中返回选定的元素
+            }).catch((e) => {})
         },
         search(keyword){
-            // 方法一
-            // var newList=[]
-            // this.list.forEach(item=>{
-            //     if (item.name.indexOf(keyword)!=-1) {
-            //         newList.push(item)
-            //     }
-            // })
-            // return newList
-
-            // 方法二
-            // filter() 方法创建一个新的数组，新数组中的元素是通过检查指定数组中符合条件的所有元素
-            // filter() 不会对空数组进行检测、不会改变原始数组
-            // forEach,some,filter,findIndex,这些都是数组的新方法，都会对数组进行遍历;
-            // ES6中为字符串提供了新方法 String.prototype.includes('字符串'),包含则返回true,否则返回false
             return this.list.filter(item=>{
                 if (item.name.includes(keyword)) {
                     return item
                 }
             })
+        },
+        getAlllist(){
+            this.$http.get('api/getprodlist').then(result=>{
+                if (result.body.status===0) {
+                    this.list=result.body.massege
+                }else{
+                    alert('获取失败')
+                }
+            }).catch((e) => {})
         }
+    },
+    created(){
+        this.getAlllist()
     }
 });
 
-var vm2 = new Vue({
-    el:'#app2',
-    data:{
-        msg:1,
-        dt:new Date()
-    },
-    methods:{},
-    filters:{
-    //定义私有过滤器，过滤器调用就近原则，如果私有过滤器和全局过滤器名称一致，会优先调用私有过滤器
 
-        dateFormat:function(dateStr,pattern=''){
-            // ES6填充字符串,String.prototype.padStart(maxLength,fillString=' ')和String.prototype.padEnd(maxLength,fillString=' ')
-            var dt=new Date()
-            var y=dt.getFullYear()
-            var m=(dt.getMonth()+1).toString().padStart(2,'0') //0代表一月所以要加一
-            var d=dt.getDate().toString().padStart(2,'0')
-            // return y+'-'+m+'-'+d
-            // return `${y}-${m}-${d}`
-            if (pattern.toLowerCase()==='yyyy-mm-dd') { //toUpperCase()
-                return `${y}-${m}-${d}`
-            }else{
-                var hh=dt.getHours().toString().padStart(2,'0')
-                var mm=dt.getMinutes().toString().padStart(2,'0')
-                var ss=dt.getSeconds().toString().padStart(2,'0')
-                return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
-            }
-        }
-    },
-    directives:{//定义私有指令
-        'fontweight':{
-            bind:function(el,binding){
-                el.style.fontWeight=binding.value
-            }
-        },
-        'fontsize':function(el,binding){//这个function等于写了bind、update两个函数里面
-            el.style.fontSize=parseInt(binding.value)+'px'
-        }
-    }
-})
-
-
-// vue实例有一个完整的生命周期,也就是从开始创建,初始化数据,编译模板,挂载Dom 渲染→更新→渲染→销毁等过程,这一个过程或者说循环就是一个生命周期
-// 生命周期是一个对象从创建、运行、销毁的过程
-// 创建：beforeCreate、created、beforeMount、mounted
-// 生命周期钩子=生命周期函数=生命周期事件;创建时期、运行时期、销毁时期
-var vm3=new Vue({
-    el:'#app3',
-    data:{
-        msg:'ok',
-    },
-    methods:{
-        show(){
-            console.log('执行show()函数')
-        },
-        getInfo(){
-            this.$http.get('http://vue.studyit.io/api/getlunbo').then(function(result){
-                console.log(result.body)
-            })
-        },
-        postInfo(){
-            //手动发起的post请求默认没有表单格式
-            //url、数据、option
-            this.$http.post('http://vue.studyit.io/api/post',{},{emulateJSON:true}).then(result=>{
-                console.log(result.body)
-            }).catch((e) => {})
-        },
-        jsonpInfo(){
-            //通过动态创建script标签实现跨域访问
-            this.$http.jsonp('http://vue.studyit.io/api/jsonp').then(result=>{
-                console.log(result.body)
-            })
-        }
-    },
-    beforeCreate(){
-    //第一个生命周期函数，实例完全被创建出来之前会执行它；
-    //在beforeCreate生命周期函数执行的时候，data和methods中的数据都还没有初始化
-        
-    },
-    created(){
-    //第二个生命周期函数，这里data和methods都被初始化好了
-    },
-    beforeMount(){
-    //第三个生命周期函数,表示模板已经在内存中编译好了，但是尚未吧模板渲染到页面中
-    //此时页面中的元素/变量未渲染出来
-    },
-    mounted(){
-    //第四个生命周期函数,此时内存中渲染好的模板已经挂载到页面中
-    //如果没有其他操作的话，实例静静的呆在内存中
-    },
-
-    //运行中的事件
-    beforeUpdate(){
-    //此时界面还没有被更新（但是数据已经被更新）
-        console.log('界面元素：'+document.getElementById('app3_h3').innerText)
-    },
-    update(){
-    //此时页面和data数据同步
-    },
-
-    //销毁，即关掉页面
-    beforeDestroy(){},//数据方法等都可用，还没有正真进入到销毁过程
-    destroyd(){}
-})
 </script>
 </body>
 </html>

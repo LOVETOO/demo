@@ -1,0 +1,143 @@
+<!-- 动画 -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>vue demo</title>
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7.min.css">
+    <style type="text/css">
+        [v-cloak]{
+            display: none;
+        }
+        .v-enter,
+        .v-leave-to{
+            opacity: 0;
+            transform: translateY(80px);
+        }
+        .v-enter-active,
+        .v-leave-active{
+            transition: all .5s ease;
+        }
+
+        /*v-move与v-leave-active配合使用，删除时下面元素会慢慢上移*/
+        .v-move{
+            transition: all .3s ease;
+        }
+        .v-leave-active{
+            position: absolute;
+        }
+
+        h4{
+            width: 100px;
+            height: 100px;
+            border-radius: 100%;
+            background-color: #f00;
+        }
+        ul li{
+            margin: 5px;
+            width: 100%;
+            line-height: 25px;
+            border: 1px dashed #333;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+<input type="button" value="toggle" @click=flag=!flag>
+<!-- vue动画要用transition标签包含 -->
+<transition>
+    <h3 v-if="flag" v-cloak>{{msg}}</h3>
+</transition>
+
+<input type="button" value="半球" @click=flags=!flags>
+<!-- vue动画要用transition标签包含 -->
+<transition
+@befoer-enter="befoerEnter"
+@enter="enter"
+@after-enter="afterEnter"
+>
+    <h4 v-if="flags" v-cloak></h4>
+</transition>
+
+
+<div class="add">
+    <label>
+        id:
+        <input type="text" v-model="id">
+    </label>
+    <label>
+        name:
+        <input type="text" v-model="name">
+    </label>
+    <input type="button" @click="add" value="添加">
+</div>
+<!-- <ul class="ul-list"> -->
+    <!-- 用v-for渲染的要用transition-group -->
+    <!-- transition-group加appear实现开始入场渐入效果 -->
+    <!-- transition-group设置tag属性，设置渲染为谁的元素，不设置则为span -->
+    <transition-group appear tag="ul" v-cloak>
+        <!-- 如果要为v-for循环创建的元素设置动画，必须为每个元素设置：key属性"item.id" -->
+        <li v-for="(item,i) in list" :key="item.id" @click="del(i)">{{item.id}} --- {{item.name}}</li>
+    </transition-group>
+<!-- </ul> -->
+
+</div>
+
+
+
+<script type="text/javascript" src="./lib/vue.js"></script>
+<!-- 向vue挂载了新属性this.$http.get等 -->
+<script type="text/javascript" src="./lib/vue-resource-1.5.1.js"></script>
+
+<script type="text/javascript">
+
+var vm = new Vue({
+    el:'#app',
+    data:{
+        msg:'动画演示',
+        flag:false,
+        flags:false,
+        id:'',
+        name:'',
+        list:[
+            {id:1,name:'赵高'},
+            {id:2,name:'秦桧'},
+            {id:3,name:'严嵩'},
+            {id:4,name:'魏忠贤'},
+        ]
+    },
+    methods:{
+        // 动画钩子第一个参数el是要操作的dom元素，元素js dom对象
+        befoerEnter(el){
+            // 这里每次运行都重置了位置 所以动画重新开始
+            el.style.transform="translate(0,0)"
+        },
+        enter(el){
+            // 如果不写 出不来动画效果；或者用el.offsetWidth、el.offsetTop
+            el.offsetWidth
+            el.style.transform="translate(150px,450px)"
+            el.style.transition="all 1s ease"
+        },
+        afterEnter(el){
+            // 动画完成之后，flag表示动画的切换，不能用opcity
+            // 上半场动画：flag=false => flag=true，下半场动画：flag=true => flag=false；
+            // input中@click=flags=!flags这里取非，直接跳过后半场动画
+            this.flags=!this.flags
+        },
+        add(){
+            this.list.push({id:this.id,name:this.name})
+            this.id=this.name=''
+        },
+        del(i){
+            this.list.splice(i,1)
+        }
+    },
+});
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!-- 组件 -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>vue demo</title>
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7.min.css">
+    <style type="text/css">
+        [v-cloak]{
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+<mylogin></mylogin>
+<login></login>
+
+</div>
+
+
+
+<script type="text/javascript" src="./lib/vue.js"></script>
+<!-- 向vue挂载了新属性this.$http.get等 -->
+<script type="text/javascript" src="./lib/vue-resource-1.5.1.js"></script>
+
+<script type="text/javascript">
+// 全局定义组件：Vue.component('组件名称',{})
+var login={
+    template:'<h1>123</h1>'
+}
+// Vue.component('mylogin',login)
+
+
+var vm = new Vue({
+    el:'#app',
+    data:{
+        msg:'123',
+        flag:false,
+        id:'',
+        name:'',
+        list:[
+            {id:1,name:'赵高'},
+            {id:2,name:'秦桧'},
+            {id:3,name:'严嵩'},
+            {id:4,name:'魏忠贤'},
+        ]
+    },
+    methods:{
+
+    },
+    // 定义私有属性
+    components:{
+        // 方法一
+        // 'mylogin':{
+        //     template:'<h1>12345</h1>'
+        // },
+
+        // 方法二
+        mylogin:login,
+
+        // 方法三
+        login
+
+        // 子组件中默认无法访问到父组件中的数据和方法
+    }
+});
+
+
+</script>
+</body>
+</html>
