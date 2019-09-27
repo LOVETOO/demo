@@ -19,8 +19,21 @@
 
 <mylogin></mylogin>
 <login></login>
+<!-- 引用子组件时通过属性绑定（v-bind:）的形式把数据传递到子组件 -->
+<!-- 父组件向子组件传递数据，自定义名称parentmsg -->
+<coml :parentmsg="msg"></coml>
+<!-- 父组件向子组件传递方法，自定义名称func，show不带() -->
+<com2 @func="show"></com2>
 
 </div>
+
+<template id="teml">
+    <!-- 每一个组件，必须只能有一个根容器 -->
+    <div>
+        <h1>1111111子组件</h1>
+        <input type="button" value="传递func方法" @click="myclick">
+    </div>
+</template>
 
 
 
@@ -36,6 +49,25 @@ var login={
 // Vue.component('mylogin',login)
 
 
+// 定义了一个字面量类型的组件模板对象
+var com2={
+    // 通过指定html中id来表示要加载这个指定id的template元素中的内容，当作html结构
+    template:'#teml',
+    data(){
+        return{
+            sonmsg:{name:'小头儿子',age:8}
+        }
+    },
+    methods:{
+        myclick(){
+            // emit:触发、调用，后面是要传给show方法的参数
+            this.$emit('func',this.sonmsg.name,this.sonmsg.age)
+        }
+    }
+}
+
+
+
 var vm = new Vue({
     el:'#app',
     data:{
@@ -43,15 +75,14 @@ var vm = new Vue({
         flag:false,
         id:'',
         name:'',
-        list:[
-            {id:1,name:'赵高'},
-            {id:2,name:'秦桧'},
-            {id:3,name:'严嵩'},
-            {id:4,name:'魏忠贤'},
-        ]
+        dataSonmsg:null
     },
     methods:{
-
+        show(data1,data2){
+            console.log('调用了父组件的show方法'+data1+data2)
+            // 子组件向父组件传值
+            this.dataSonmsg=data1
+        }
     },
     // 定义私有属性
     components:{
@@ -64,9 +95,28 @@ var vm = new Vue({
         mylogin:login,
 
         // 方法三
-        login
+        login,
+
+        com2,
 
         // 子组件中默认无法访问到父组件中的数据和方法
+        coml:{
+            template:'<h3>111 --- {{parentmsg}}</h3>',
+            // 子组件中的data数据并不是父组件传递过来的，而是子组件私有，如ajax，可读可写
+            data(){
+                return{
+                    title:'1122',
+                    content:'qqq'
+                }
+            },
+            // 组建中所有props中的数据都是父组件传递过来的，只读，不能赋值
+            // 把父组件传递的parentmsg属性，在props数组中定义后才能使用
+            props:['parentmsg'],
+            directives:{},
+            filters:{},
+            components:{},
+            methods:{}
+        }
     }
 });
 

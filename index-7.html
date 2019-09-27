@@ -1,0 +1,129 @@
+<!-- 组件--评论功能 -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>vue demo</title>
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7.min.css">
+    <style type="text/css">
+        [v-cloak]{
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+<cmt-box @func="loadComments"></cmt-box>
+
+<ul class="list-group">
+    <li class="list-group-item" v-for="item in list" :key="item.id">
+        <span class="badge">评论人：{{item.user}}</span>
+        {{item.content}}
+    </li>
+</ul>
+
+<div>
+    <input type="button" value="获取元素" @click="getElement">
+    <h3 ref="myh3">获取元素到文本</h3>
+</div>
+
+<!-- ref可以父组件中获取子组件的数据和内容 -->
+<login ref="mylogin"></login>
+
+</div>
+
+
+
+
+<template id="teml">
+    <div>
+        <div class="form-group">
+            <label>评论人：</label>
+            <input type="text" class="form-control" v-model="user">
+        </div>
+        <div class="form-group">
+            <label>评论内容：</label>
+            <textarea class="form-control" v-model="content"></textarea>
+        </div>
+        <div class="form-group">
+            <input type="button" value="发表评论" class="btn btn-primary" @click="postComment">
+        </div>
+    </div>
+</template>
+
+
+<script type="text/javascript" src="./lib/vue.js"></script>
+
+<script type="text/javascript">
+var login={
+    template:'<h2>登录组件</h2>',
+    data(){
+        return{
+            msg:'son msg'
+        }
+    }
+}
+
+var commentBox={
+    data(){
+        return{
+            user:'',
+            content:''
+        }
+    },
+    template:'#teml',
+    methods:{
+        postComment(){
+            // 评论数据储存到localStorage（只支持储存字符串）中
+            // 如果获取的数据不存在则需要返回'[]'，不然报错
+
+            var comment={id:Date.now(),user:this.user,content:this.content}
+            var list=JSON.parse(localStorage.getItem('cmts') || '[]')
+            // 拼接到头部/前面
+            list.unshift(comment)
+            localStorage.setItem('cmts',JSON.stringify(list))
+            this.user=this.content=''
+            this.$emit('func')
+        }
+    }
+}
+
+// new:实例化对象
+var vm = new Vue({
+    el:'#app',
+    data:{
+        list:[
+            {id:1,user:'李白',content:'天生我材必有用'},
+            {id:2,user:'江小白',content:'劝君更进一杯酒'},
+            {id:3,user:'小马',content:'我姓马，风吹草低见牛羊的马'},
+        ]
+    },
+    created(){
+        this.loadComments()
+    },
+    methods:{
+        loadComments(){
+            var list=JSON.parse(localStorage.getItem('cmts') || '[]')
+            this.list=list
+        },
+        getElement(){
+            // ref=reference，获取文本
+            console.log(this.$refs.myh3.innerText)
+            // 获取子组件数据
+            console.log(this.$refs.mylogin.msg)
+        }
+    },
+    components:{
+        'cmt-box':commentBox,
+        login,
+    }
+});
+
+
+</script>
+</body>
+</html>

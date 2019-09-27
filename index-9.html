@@ -1,0 +1,109 @@
+<!-- 路由 -- 路由嵌套 -->
+<!-- https://www.cnblogs.com/joyho/articles/4430148.html -->
+
+<!-- https://blog.csdn.net/qq_29150765/article/details/81607321 -->
+
+<!-- 服务器端路由：的功能是根据URL地址，跳转到相应页面，这些页面都是真实存在于服务端的 -->
+<!-- 前端路由：由前端实现以上功能，前端只存在d单页面首页index.htm -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>vue demo</title>
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7.min.css">
+    <style type="text/css">
+        [v-cloak]{
+            display: none;
+        }
+        .router-link-active,
+        .myactive{
+            color: #f00;
+            font-weight: 700;
+            font-style: italic;
+            font-size: 30px;
+            text-decoration: underline;
+        }
+        .v-enter,
+        .v-leave-to{
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        .v-enter-active,
+        .v-leave-active{
+            transition: all .3s ease;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+<router-link to="/account">account</router-link>
+<router-view></router-view>
+
+</div>
+
+
+
+<template id="teml">
+    <div>
+        <h1>这是account组件</h1>
+        <router-link to="/account/login">登录</router-link>
+        <router-link to="/account/register">注册</router-link>
+        <router-view></router-view>
+    </div>
+</template>
+
+
+
+<script type="text/javascript" src="./lib/vue.js"></script>
+<script type="text/javascript" src="./lib/vue-router-3.1.3.js"></script>
+
+<script type="text/javascript">
+
+// 路由嵌套
+var account={
+    template:'#teml'
+}
+var login={
+    template:'<h2>登录</h2>'
+}
+var register={
+    template:'<h3>注册</h3>'
+}
+
+
+
+var routerObj=new VueRouter({
+    routes:[
+        {
+            path:'/account',
+            component:account,
+            children:[
+                // 前面一般不带/,这样前面拼接/account
+                {path:'login',component:login},
+                {path:'register',component:register}
+            ]
+        }
+    ]
+})
+
+
+var vm = new Vue({
+    el:'#app',
+    data:{
+
+    },
+    methods:{
+    },
+    components:{
+    },
+    // 将路由规则对象注册到vm实例上，用来监听url地址变化，然后展示对应组件
+    router:routerObj
+});
+
+
+</script>
+</body>
+</html>
