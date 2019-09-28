@@ -1,4 +1,4 @@
-<!-- 案例--名称 @keyup -->
+<!-- 案例--名称 watch -->
 
 <!DOCTYPE html>
 <html>
@@ -17,8 +17,8 @@
 <body>
 <div id="app">
 
-<input type="text" v-model="firstname" @keyup="getFullname"> + 
-<input type="text" v-model="lastname" @keyup="getFullname"> = 
+<input type="text" v-model="firstname"> + 
+<input type="text" v-model="lastname"> = 
 <input type="text" v-model="fullname">
 
 </div>
@@ -36,12 +36,15 @@ var vm = new Vue({
         lastname:'',
         fullname:''
     },
-    methods:{
-        getFullname(){
-            this.fullname=this.firstname+'-'+this.lastname
+    methods:{},
+    watch:{
+        // 监视data中指定数据的变化，然后触发watch中对应function;可以监听路由
+        firstname:function(newVal,oldVal){
+            this.fullname=newVal+'-'+this.lastname
+        },
+        lastname:function(newVal){
+            this.fullname=this.firstname+'-'+newVal
         }
-    },
-    components:{
     },
 });
 

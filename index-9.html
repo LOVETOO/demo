@@ -100,7 +100,17 @@ var vm = new Vue({
     components:{
     },
     // 将路由规则对象注册到vm实例上，用来监听url地址变化，然后展示对应组件
-    router:routerObj
+    router:routerObj,
+    watch:{
+        // 监听路由
+        '$route.path':function(newVal,oldVal){
+            if (newVal==='/account/login') {
+                console.log('欢迎进入登录页面')
+            }else if (newVal==='/account/register') {
+                console.log('欢迎进入注册页面')
+            }
+        }
+    }
 });
 
 
