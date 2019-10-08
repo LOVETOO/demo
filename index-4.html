@@ -115,6 +115,7 @@ var vm = new Vue({
     },
     methods:{
         add(){
+            // api前不加/，因为设置了全局路径配置，这样才按照配置走
              this.$http.post('api/addproduct',{name:this.name}).then(result=>{
                 this.name=''
                 if (result.body.status===0) {

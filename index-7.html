@@ -87,6 +87,7 @@ var commentBox={
             list.unshift(comment)
             localStorage.setItem('cmts',JSON.stringify(list))
             this.user=this.content=''
+            // $emit调用传递过来的func
             this.$emit('func')
         }
     }

@@ -39,6 +39,7 @@ var vm = new Vue({
     methods:{},
     watch:{
         // 监视data中指定数据的变化，然后触发watch中对应function;可以监听路由
+        // 左侧是属性名称
         firstname:function(newVal,oldVal){
             this.fullname=newVal+'-'+this.lastname
         },
