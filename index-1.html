@@ -31,14 +31,16 @@
     <!-- 阻止冒泡 -->
     <input type="button" value="戳他" @click.stop="btninput">
     <!-- 阻止默认事件 -->
+    <!-- prevent 是拦截默认事件，passive是不拦截默认事件 -->
     <a href="http://baidu.com" @click.stop.prevent="btna">百度</a>
 </div>
 
-<!-- 冒泡从外到里 -->
+<!-- 冒泡从外到里，即元素自身触发的事件先在此处处理，然后才交由内部元素进行处理 -->
 <div class="inner" @click.capture="btninner">
     <input type="button" value="戳他" @click="btninput">
 </div>
 
+<!-- 用v-on:click.prevent.self会阻止所有的点击，而 v-on:click.self.prevent 只会阻止对元素自身的点击 -->
 <!-- 点击自身才会触发事件 -->
 <div class="inner" @click.self="btninner">
     <input type="button" value="戳他" @click="btninput">
